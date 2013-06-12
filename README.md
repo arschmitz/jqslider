@@ -1,0 +1,4 @@
+jqslider
+========
+
+Very basic slider 
