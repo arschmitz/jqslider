@@ -346,8 +346,9 @@
 			_dragBehavior: function(data ){
 				var first = ( data.target == this.thumb ),
 					input = ( first ) ? ( ( this.dual ) ? this.firstInput : this ) : this.secondInput,
-					percent, curVal = $( this )[ pluginName ]( "_percentToValue", percent );
+					percent, curVal;
 				percent = Math.round( ( data.offsetX / this.cW ) * 100 );
+				curVal = $( this )[ pluginName ]( "_percentToValue", percent )
 				if( curVal !== $( input ).val() ){
 					$( input ).val( curVal ).trigger( "change" );
 				}
@@ -369,20 +370,15 @@
 					});
 			},
 			_bindHighlightEvents: function(){
-				var self = this, value, diff, curVal;
+				var self = this, value, diff;
 				$( this.highlight ).bind( "mousedown", function( e ){
 					$( this ).focus();
 					diff = ( !self.isSelect )? ( $( self.secondInput ).val() - $( self.firstInput ).val() ): ( self.valueMap[ $( self.secondInput ).val() ] - self.valueMap[ $( self.firstInput ).val() ]);
 					$( 'body' ).bind( "mousemove", function( ev ){
 						value = $( self )[ pluginName ]( "_percentToValue", Math.round( ( ( ev.pageX - $( self.slider ).offset().left - e.offsetX ) / self.sCW ) * 100 ));
 						if( value + diff <= self.max || ( self.isSelect && self.valueMap[ value ] + diff <= self.max ) ){
-							if( self.firstinput.val() !== value ){
-								$( self.firstInput ).val(  value ).trigger( "change" );
-							}
-							curVal = (self.isSelect)? (self.indexMap[ self.valueMap[ $( self.firstInput ).val() ] + diff ]): ( parseInt( $( self.firstInput ).val(), 10 ) + diff);
-							if( curVal !=  $( self.secondInput ).val() ){
-								$( self.secondInput ).val(  ).trigger( "change" );
-							}
+							$( self.firstInput ).val(  value ).trigger( "change" );
+							$( self.secondInput ).val( (self.isSelect)? (self.indexMap[ self.valueMap[ $( self.firstInput ).val() ] + diff ]): ( parseInt( $( self.firstInput ).val(), 10 ) + diff) ).trigger( "change" );
 						}
 					}).bind( "mouseup", function( e ) {
 						$( this ).unbind( "mousemove" );
