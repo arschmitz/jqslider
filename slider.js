@@ -346,11 +346,11 @@
 			_dragBehavior: function(data ){
 				var first = ( data.target == this.thumb ),
 					input = ( first ) ? ( ( this.dual ) ? this.firstInput : this ) : this.secondInput,
-					percent, curVal;
+					percent, curVal = null;
 				percent = Math.round( ( data.offsetX / this.cW ) * 100 );
-				curVal = $( this )[ pluginName ]( "_percentToValue", percent )
+				curVal = $( this )[ pluginName ]( "_percentToValue", percent );
 				if( curVal !== $( input ).val() ){
-					$( input ).val( curVal ).trigger( "change" );
+					$( input ).val( ).trigger( "change" );
 				}
 			},
 			_mouseDown : function( e, data ) {
