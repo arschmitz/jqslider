@@ -118,7 +118,7 @@
 				slider.appendChild( thumb );
 
 				this.parentNode.insertBefore( slider, this );
-
+				sliderClientWidth = slider.clientWidth;
 				$.extend( this, {
 					thumb: thumb,
 					slider: slider,
@@ -129,7 +129,8 @@
 					step: parseInt( step, 10 ),
 					span: parseInt( span, 10 ),
 					steps: parseInt( steps, 10 ),
-					stepSize: stepSize
+					stepSize: stepSize,
+					sliderClientWidth: sliderClientWidth
 				});
 				if( isSelect ){
 					$( this )[ pluginName ]( "_buildDict" );
@@ -137,8 +138,6 @@
 				if( !this.dual ){
 					$( this )[ pluginName ]( "_moveHandle", thumb, $( this ).val() );
 				}
-				this.sCW = this.slider.clientWidth;
-				this.cW = this.clientWidth;
 			},
 			_moveHandle: function( thumb, value, skip ){
 				var percent = $( this )[pluginName]( "_valueToPercent", value );
@@ -147,7 +146,7 @@
 
 				if( this.dual ){
 					if( !skip ){
-						this.highlight.style.width = ((parseInt( this.thumb2.offsetLeft, 10 ) - parseInt( this.thumb.offsetLeft, 10 ) + parseInt( this.thumb.offsetWidth, 10) ) / this.cW ) * 100  + "%";
+						this.highlight.style.width = ((parseInt( this.thumb2.offsetLeft, 10 ) - parseInt( this.thumb.offsetLeft, 10 ) + parseInt( this.thumb.offsetWidth, 10) ) / this.sliderClientWidth ) * 100  + "%";
 					}
 					if( thumb === this.thumb ){
 						this.highlight.style.left = percent + "%";
@@ -297,17 +296,14 @@
 				}
 			},
 			_handleSliderMousedown: function( e ){
-				var percent, input, data = {}, curVal;
+				var percent, input, data = {};
 					e.offsetX = (typeof e.offsetX === "undefined" || isNaN( e.offsetX ) )? e.originalEvent.layerX: e.offsetX;
 				if( e.target !== this.slider ){
 					e.offsetX = e.offsetX + e.target.offsetLeft;
 				}
 				percent = ( e.offsetX / this.slider.offsetWidth ) * 100;
 				input = ( $( this )[pluginName]( "_moveFirst", e ) )? ( ( this.dual )? this.firstInput: this ): this.secondInput;
-				curVal = $( this )[pluginName]( "_percentToValue", percent );
-				if( curVal !== $( input ).val() ){
-					$( input ).val( curVal ).trigger( "change" );
-				}
+				$( input ).val( $( this )[pluginName]( "_percentToValue", percent ) ).trigger( "change" );
 				data.srcEvent = {};
 				e.target = ( $( this )[pluginName]( "_moveFirst", e ) )? this.thumb: this.thumb2;
 				data.srcEvent.target = ( $( this )[ pluginName ]( "_moveFirst", e ) )? this.thumb: this.thumb2;
@@ -346,12 +342,9 @@
 			_dragBehavior: function(data ){
 				var first = ( data.target == this.thumb ),
 					input = ( first ) ? ( ( this.dual ) ? this.firstInput : this ) : this.secondInput,
-					percent, curVal = null;
-				percent = Math.round( ( data.offsetX / this.cW ) * 100 );
-				curVal = $( this )[ pluginName ]( "_percentToValue", percent );
-				if( curVal !== $( input ).val() ){
-					$( input ).val( curVal ).trigger( "change" );
-				}
+					percent;
+				percent = Math.round( ( data.offsetX / this.sliderClientWidth ) * 100 );
+				$( input ).val( $( this )[ pluginName ]( "_percentToValue", percent ) ).trigger( "change" );
 			},
 			_mouseDown : function( e, data ) {
 				var $oEl = $( this ), self = this;
@@ -369,13 +362,14 @@
 						$( this ).unbind( "mousemove", moveSlider );
 					});
 			},
+			_clientWidth = null,
 			_bindHighlightEvents: function(){
 				var self = this, value, diff;
 				$( this.highlight ).bind( "mousedown", function( e ){
 					$( this ).focus();
 					diff = ( !self.isSelect )? ( $( self.secondInput ).val() - $( self.firstInput ).val() ): ( self.valueMap[ $( self.secondInput ).val() ] - self.valueMap[ $( self.firstInput ).val() ]);
 					$( 'body' ).bind( "mousemove", function( ev ){
-						value = $( self )[ pluginName ]( "_percentToValue", Math.round( ( ( ev.pageX - $( self.slider ).offset().left - e.offsetX ) / self.sCW ) * 100 ));
+						value = $( self )[ pluginName ]( "_percentToValue", Math.round( ( ( ev.pageX - $( self.slider ).offset().left - e.offsetX ) / self.slider.clientWidth ) * 100 ));
 						if( value + diff <= self.max || ( self.isSelect && self.valueMap[ value ] + diff <= self.max ) ){
 							$( self.firstInput ).val(  value ).trigger( "change" );
 							$( self.secondInput ).val( (self.isSelect)? (self.indexMap[ self.valueMap[ $( self.firstInput ).val() ] + diff ]): ( parseInt( $( self.firstInput ).val(), 10 ) + diff) ).trigger( "change" );
