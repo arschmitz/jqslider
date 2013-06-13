@@ -350,7 +350,7 @@
 				percent = Math.round( ( data.offsetX / this.cW ) * 100 );
 				curVal = $( this )[ pluginName ]( "_percentToValue", percent );
 				if( curVal !== $( input ).val() ){
-					$( input ).val( ).trigger( "change" );
+					$( input ).val( curVal ).trigger( "change" );
 				}
 			},
 			_mouseDown : function( e, data ) {
