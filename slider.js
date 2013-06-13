@@ -362,7 +362,6 @@
 						$( this ).unbind( "mousemove", moveSlider );
 					});
 			},
-			_clientWidth = null,
 			_bindHighlightEvents: function(){
 				var self = this, value, diff;
 				$( this.highlight ).bind( "mousedown", function( e ){
